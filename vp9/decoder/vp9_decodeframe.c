@@ -1642,12 +1642,8 @@ static const uint8_t *decode_tiles_mt(VP9Decoder *pbi, const uint8_t *data,
       buf_start += count;
 
       worker->had_error = 0;
-      if (n == num_workers - 1) {
-        assert(tile_data->buf_end == tile_cols - 1);
-        winterface->execute(worker);
-      } else {
-        winterface->launch(worker);
-      }
+      if (n == num_workers - 1) assert(tile_data->buf_end == tile_cols - 1);
+      winterface->launch(worker);
     }
 
     for (; n > 0; --n) {
