@@ -55,7 +55,7 @@ build_target() {
       ;;
   esac
 
-  mkdir "${target}"
+  mkdir -p "${target}"
   cd "${target}"
   eval "${LIBVPX_SOURCE_DIR}/configure" --target="${target}" \
     ${CONFIGURE_ARGS} ${EXTRA_CONFIGURE_ARGS} ${target_specific_flags} \
@@ -185,7 +185,10 @@ build_framework() {
   local target_dist_dir=""
 
   # Clean up from previous build(s).
-  rm -rf "${BUILD_ROOT}" "${FRAMEWORK_DIR}"
+  rm -rf "${FRAMEWORK_DIR}"
+  if [ "${PRESERVE_BUILD_OUTPUT}" != "yes" ]; then
+    rm -rf "${BUILD_ROOT}"
+  fi
 
   # Create output dirs.
   mkdir -p "${BUILD_ROOT}"
