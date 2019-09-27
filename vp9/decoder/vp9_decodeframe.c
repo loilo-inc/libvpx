@@ -1555,7 +1555,7 @@ static const uint8_t *decode_tiles_mt(VP9Decoder *pbi, const uint8_t *data,
       ++pbi->num_tile_workers;
 
       winterface->init(worker);
-      if (n < num_threads - 1 && !winterface->reset(worker)) {
+      if (!winterface->reset(worker)) {
         vpx_internal_error(&cm->error, VPX_CODEC_ERROR,
                            "Tile decoder thread creation failed");
       }
