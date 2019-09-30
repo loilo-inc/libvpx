@@ -1547,18 +1547,18 @@ static const uint8_t *decode_tiles_mt(VP9Decoder *pbi, const uint8_t *data,
   (void)tile_rows;
 
   if (pbi->num_tile_workers == 0) {
-    const int num_threads = pbi->max_threads;
     CHECK_MEM_ERROR(cm, pbi->tile_workers,
-                    vpx_malloc(num_threads * sizeof(*pbi->tile_workers)));
-    for (n = 0; n < num_threads; ++n) {
-      VPxWorker *const worker = &pbi->tile_workers[n];
-      ++pbi->num_tile_workers;
+                    vpx_malloc(pbi->max_threads * sizeof(*pbi->tile_workers)));
+  }
 
-      winterface->init(worker);
-      if (!winterface->reset(worker)) {
-        vpx_internal_error(&cm->error, VPX_CODEC_ERROR,
-                           "Tile decoder thread creation failed");
-      }
+  for (n = pbi->num_tile_workers; n < num_workers; ++n) {
+    VPxWorker *const worker = &pbi->tile_workers[n];
+    ++pbi->num_tile_workers;
+
+    winterface->init(worker);
+    if (!winterface->reset(worker)) {
+      vpx_internal_error(&cm->error, VPX_CODEC_ERROR,
+                         "Tile decoder thread creation failed");
     }
   }
 
