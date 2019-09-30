@@ -1589,20 +1589,11 @@ static const uint8_t *decode_tiles_mt(VP9Decoder *pbi, const uint8_t *data,
   get_tile_buffers(pbi, data, data_end, tile_cols, tile_rows,
                    &pbi->tile_buffers);
 
-  // Sort the buffers based on size in descending order.
-  qsort(pbi->tile_buffers, tile_cols, sizeof(pbi->tile_buffers[0]),
-        compare_tile_buffers);
+  if (num_workers < tile_cols) {
+    // Sort the buffers based on size in descending order.
+    qsort(pbi->tile_buffers, tile_cols, sizeof(pbi->tile_buffers[0]),
+          compare_tile_buffers);
 
-  if (num_workers == tile_cols) {
-    // Rearrange the tile buffers such that the largest, and
-    // presumably the most difficult, tile will be decoded in the main thread.
-    // This should help minimize the number of instances where the main thread
-    // is waiting for a worker to complete.
-    const TileBuffer largest = pbi->tile_buffers[0];
-    memmove(pbi->tile_buffers, pbi->tile_buffers + 1,
-            (tile_cols - 1) * sizeof(pbi->tile_buffers[0]));
-    pbi->tile_buffers[tile_cols - 1] = largest;
-  } else {
     int start = 0, end = tile_cols - 2;
     TileBuffer tmp;
 
