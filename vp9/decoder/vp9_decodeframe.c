@@ -2293,7 +2293,7 @@ static INLINE void init_mt(VP9Decoder *pbi) {
       ++pbi->num_tile_workers;
 
       winterface->init(worker);
-      if (n < num_threads - 1 && !winterface->reset(worker)) {
+      if (!winterface->reset(worker)) {
         vpx_internal_error(&cm->error, VPX_CODEC_ERROR,
                            "Tile decoder thread creation failed");
       }
@@ -2532,12 +2532,8 @@ static const uint8_t *decode_tiles_mt(VP9Decoder *pbi, const uint8_t *data,
       buf_start += count;
 
       worker->had_error = 0;
-      if (n == num_workers - 1) {
-        assert(tile_data->buf_end == tile_cols - 1);
-        winterface->execute(worker);
-      } else {
-        winterface->launch(worker);
-      }
+      if (n == num_workers - 1) assert(tile_data->buf_end == tile_cols - 1);
+      winterface->launch(worker);
     }
 
     for (; n > 0; --n) {
