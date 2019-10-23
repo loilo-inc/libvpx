@@ -37,7 +37,7 @@ SIM_TARGETS="x86-iphonesimulator-gcc
              x86_64-iphonesimulator-gcc"
 OSX_TARGETS="x86-darwin16-gcc
              x86_64-darwin16-gcc"
-TARGETS="${ARM_TARGETS} ${SIM_TARGETS}"
+TARGETS="${ARM_TARGETS}"
 
 # Configures for the target specified by $1, and invokes make with the dist
 # target using $DIST_DIR as the distribution output directory.
