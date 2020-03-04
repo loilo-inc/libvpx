@@ -202,10 +202,6 @@ build_framework() {
     else
       local suffix="a"
     fi
-    if [ "${ENABLE_SHARED}" = "yes" ]; then
-      # Adjust the dylib's name so dynamic linking in apps works as expected.（for Archive with bitcode in Xcode）
-      install_name_tool -id '@rpath/VPX.framework/VPX' ${target}/${DIST_DIR}/lib/libvpx.${suffix}
-    fi
     lib_list="${lib_list} ${target_dist_dir}/lib/libvpx.${suffix}"
   done
 

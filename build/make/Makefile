@@ -316,6 +316,7 @@ $(1):
 	$(if $(quiet),@echo "    [LD] $$@")
 	$(qexec)$$(LD) -dynamiclib $$(LDFLAGS) \
 	    -exported_symbols_list $$(EXPORTS_FILE) \
+		-install_name @rpath/VPX.framework/VPX \
         -Wl,-headerpad_max_install_names,-compatibility_version,1.0,-current_version,$$(VERSION_MAJOR) \
         -o $$@ \
         $$(filter %.o,$$^) $$(extralibs)
