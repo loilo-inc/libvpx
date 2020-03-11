@@ -916,6 +916,22 @@ process_common_toolchain() {
         add_ldflags "-isysroot ${iossim_sdk_dir}"
       fi
       ;;
+    *-maccatalyst-*)
+      add_cflags  "-miphoneos-version-min=13.1"
+      add_ldflags "-miphoneos-version-min=13.1"
+      osx_sdk_dir="$(show_darwin_sdk_path macosx)"
+      if [ -d "${osx_sdk_dir}" ]; then
+        add_cflags  "-target x86_64-apple-ios13.1-macabi"
+        add_cflags  "-isysroot ${osx_sdk_dir}"
+        add_cflags  "-isystem ${osx_sdk_dir}/System/iOSSupport/usr/include"
+        add_cflags  "-iframework ${osx_sdk_dir}/System/iOSSupport/System/Library/Frameworks"
+        add_ldflags "-target x86_64-apple-ios13.1-macabi"
+        add_ldflags "-isysroot ${osx_sdk_dir}"
+        add_ldflags "-L${osx_sdk_dir}/System/iOSSupport/usr/lib"
+        add_ldflags "-isystem ${osx_sdk_dir}/System/iOSSupport/usr/include"
+        add_ldflags "-iframework ${osx_sdk_dir}/System/iOSSupport/System/Library/Frameworks"
+      fi
+      ;;
   esac
 
   # Handle Solaris variants. Solaris 10 needs -lposix4
@@ -1308,6 +1324,12 @@ EOF
           ;;
       esac
 
+      case  ${tgt_os} in
+        maccatalyst)
+          disable_exts="yes"
+          ;;
+      esac
+
       soft_enable runtime_cpu_detect
       # We can't use 'check_cflags' until the compiler is configured and CC is
       # populated.
@@ -1390,6 +1412,19 @@ EOF
 
           if [ "$(disabled external_build)" ] &&
               [ "$(show_darwin_sdk_major_version iphonesimulator)" -gt 8 ]; then
+            # yasm v1.3.0 doesn't know what -fembed-bitcode means, so turning it
+            # on is pointless (unless building a C-only lib). Warn the user, but
+            # do nothing here.
+            log "Warning: Bitcode embed disabled for simulator targets."
+          fi
+          ;;
+        maccatalyst)
+          add_asflags -f macho${bits}
+          catalyst_arch="-arch x86_64"
+          add_cflags  ${catalyst_arch}
+          add_ldflags ${catalyst_arch}
+
+          if [ "$(disabled external_build)" ]; then
             # yasm v1.3.0 doesn't know what -fembed-bitcode means, so turning it
             # on is pointless (unless building a C-only lib). Warn the user, but
             # do nothing here.
